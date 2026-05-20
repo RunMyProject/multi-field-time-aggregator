@@ -10,3 +10,4 @@ A web application to dynamically aggregate and sum employee project working hour
 
 * **[`docs/STARTUP_LOG.MD`](./docs/STARTUP_LOG.MD)**: Session logs, project initialization, Git token setup and integration testing architecture.
 * **[`docs/SETUP_ACTIVITY_REGISTRY.MD`](./docs/SETUP_ACTIVITY_REGISTRY.MD)**: Session logs, domain modeling, In-Memory DB setup, service wiring, automation script and integration testing validation.
+* **[`docs/SOLUTION_PROPOSED.MD`](./docs/SOLUTION_PROPOSED.MD)**: Session logs, architectural refactoring, multi-field aggregation logic (3-step Stream pipeline), sorting strategy implementation and API v2.0 integration.
