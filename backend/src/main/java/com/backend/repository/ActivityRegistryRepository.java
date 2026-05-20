@@ -1,6 +1,9 @@
 package com.backend.repository;
 
 import com.backend.model.ActivityRegistry;
+import com.backend.model.EmployeeProjectHoursRow;
+import com.backend.model.ProjectEmployeeHoursRow;
+import com.backend.model.ProjectHoursRow;
 import java.util.List;
 
 /**
@@ -16,4 +19,22 @@ public interface ActivityRegistryRepository {
      * @return List of ActivityRegistry entities.
      */
     List<ActivityRegistry> findAll();
+
+    /**
+     * Aggregates total hours bucketed strictly by Project.
+     * @return List of ProjectHoursRow projections.
+     */
+    List<ProjectHoursRow> findAllByProject();
+
+    /**
+     * Aggregates total hours bucketed by Project and then by Employee.
+     * @return List of ProjectEmployeeHoursRow projections.
+     */
+    List<ProjectEmployeeHoursRow> findAllByProjectAndEmployee();
+
+    /**
+     * Aggregates total hours bucketed by Employee and then by Project.
+     * @return List of EmployeeProjectHoursRow projections.
+     */
+    List<EmployeeProjectHoursRow> findAllByEmployeeAndProject();
 }

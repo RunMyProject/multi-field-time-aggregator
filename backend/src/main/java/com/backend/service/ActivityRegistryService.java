@@ -1,6 +1,9 @@
 package com.backend.service;
 
 import com.backend.model.ActivityRegistry;
+import com.backend.model.EmployeeProjectHoursRow;
+import com.backend.model.ProjectEmployeeHoursRow;
+import com.backend.model.ProjectHoursRow;
 import com.backend.repository.ActivityRegistryRepositoryInMemoryDBImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -27,5 +30,29 @@ public class ActivityRegistryService {
     public List<ActivityRegistry> getAllActivities() {
         // Execute operational pipeline call to the in-memory repository instance
         return repository.findAll();
+    }
+
+    /**
+     * Service contract to retrieve hours aggregated strictly by Project.
+     * @return List of ProjectHoursRow projections.
+     */
+    public List<ProjectHoursRow> getActivitiesGroupedByProject() {
+        return repository.findAllByProject();
+    }
+
+    /**
+     * Service contract to retrieve hours aggregated by Project and Employee.
+     * @return List of ProjectEmployeeHoursRow projections.
+     */
+    public List<ProjectEmployeeHoursRow> getActivitiesGroupedByProjectAndEmployee() {
+        return repository.findAllByProjectAndEmployee();
+    }
+
+    /**
+     * Service contract to retrieve hours aggregated by Employee and Project.
+     * @return List of EmployeeProjectHoursRow projections.
+     */
+    public List<EmployeeProjectHoursRow> getActivitiesGroupedByEmployeeAndProject() {
+        return repository.findAllByEmployeeAndProject();
     }
 }

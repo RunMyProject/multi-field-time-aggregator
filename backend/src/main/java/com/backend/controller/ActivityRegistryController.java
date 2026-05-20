@@ -1,12 +1,14 @@
 package com.backend.controller;
 
 import com.backend.model.ActivityRegistry;
+import com.backend.model.GroupStrategy;
 import com.backend.service.ActivityRegistryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
@@ -41,5 +43,35 @@ public class ActivityRegistryController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(data);
+    }
+
+    /**
+     * Endpoint targeting activity monitoring arrays, supporting dynamic business groupings.
+     * @param groupBy Optional strategy parameter (NONE, PROJECT, EMPLOYEE). Defaults to NONE.
+     * @return ResponseEntity holding standard HTTP envelope and the specific aggregated dataset.
+     */
+    @GetMapping(path = "/activities", version = "2.0")
+    public ResponseEntity<?> getActivities(
+            @RequestParam(value = "groupBy", required = false, defaultValue = "NONE") GroupStrategy groupBy
+    ) {
+        // Modern Switch Expression sorting the execution flow directly to the correct projection list
+        // NB: the Switch Expression is a Java 14+ feature, enabling more concise and readable branching logic
+        return switch (groupBy) {
+            case NONE -> ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(activityRegistryService.getAllActivities());
+
+            case PROJECT -> ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(activityRegistryService.getActivitiesGroupedByProject());
+
+            case PROJECT_EMPLOYEE -> ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(activityRegistryService.getActivitiesGroupedByProjectAndEmployee());
+
+            case EMPLOYEE_PROJECT -> ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(activityRegistryService.getActivitiesGroupedByEmployeeAndProject());
+        };
     }
 }
