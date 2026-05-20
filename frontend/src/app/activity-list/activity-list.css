@@ -1,0 +1,324 @@
+/*
+ * activity-list.css
+ * Author: Edoardo Sabatini
+ * Date:   2026-05-20
+ * Description: Scoped styles for the ActivityList component.
+ *              Design direction: editorial / utilitarian dark-slate palette with
+ *              sharp amber accents. Clean type hierarchy, subtle hover states,
+ *              and a sticky header — no external UI library required.
+ */
+
+/* ── Design tokens ─────────────────────────────────────────────────────── */
+:host {
+  --al-bg:          #0f1117;
+  --al-surface:     #181c27;
+  --al-border:      #252b3b;
+  --al-border-l:    #2e364e;
+  --al-text-pri:    #e8ecf5;
+  --al-text-sec:    #8b96b2;
+  --al-accent:      #f5a623;
+  --al-accent-dim:  rgba(245, 166, 35, 0.12);
+  --al-success:     #34d399;
+  --al-error-bg:    rgba(239, 68, 68, 0.08);
+  --al-error-border: rgba(239, 68, 68, 0.35);
+  --al-error-text:  #f87171;
+  --al-radius:      6px;
+  --al-font-mono:   'JetBrains Mono', 'Fira Mono', 'Consolas', monospace;
+  --al-font-ui:     'IBM Plex Sans', 'Segoe UI', sans-serif;
+  display: block;
+  font-family: var(--al-font-ui);
+  color: var(--al-text-pri);
+  background: var(--al-bg);
+  min-height: 100vh;
+}
+
+/* ── Shell ─────────────────────────────────────────────────────────────── */
+.al-shell {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 4rem;
+}
+
+/* ── Header ────────────────────────────────────────────────────────────── */
+.al-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--al-border);
+  margin-bottom: 1.5rem;
+}
+
+.al-header__title {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.al-header__icon {
+  font-size: 1.4rem;
+}
+
+.al-header__title h1 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  margin: 0;
+  color: var(--al-text-pri);
+}
+
+.al-header__controls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+/* ── Select ────────────────────────────────────────────────────────────── */
+.al-select-label {
+  font-size: 0.8rem;
+  color: var(--al-text-sec);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.al-select {
+  appearance: none;
+  background: var(--al-surface);
+  border: 1px solid var(--al-border-l);
+  border-radius: var(--al-radius);
+  color: var(--al-text-pri);
+  font-family: var(--al-font-mono);
+  font-size: 0.82rem;
+  padding: 0.45rem 2rem 0.45rem 0.75rem;
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%238b96b2' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.6rem center;
+  transition: border-color 0.15s;
+}
+
+.al-select:focus {
+  outline: none;
+  border-color: var(--al-accent);
+  box-shadow: 0 0 0 2px var(--al-accent-dim);
+}
+
+/* ── Buttons ───────────────────────────────────────────────────────────── */
+.al-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border: none;
+  border-radius: var(--al-radius);
+  font-family: var(--al-font-ui);
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0.45rem 0.9rem;
+  transition: background 0.15s, opacity 0.15s;
+}
+
+.al-btn--ghost {
+  background: var(--al-surface);
+  border: 1px solid var(--al-border-l);
+  color: var(--al-text-sec);
+}
+.al-btn--ghost:hover:not(:disabled) {
+  border-color: var(--al-accent);
+  color: var(--al-accent);
+}
+.al-btn--ghost:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.al-btn--primary {
+  background: var(--al-accent);
+  color: #0f1117;
+  font-weight: 600;
+}
+.al-btn--primary:hover {
+  opacity: 0.88;
+}
+
+.al-btn__icon {
+  font-size: 1rem;
+  line-height: 1;
+  display: inline-block;
+}
+
+.al-spinning {
+  animation: al-spin 0.9s linear infinite;
+}
+@keyframes al-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── State panels (loading / error) ────────────────────────────────────── */
+.al-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 3rem 1rem;
+  text-align: center;
+  color: var(--al-text-sec);
+  font-size: 0.9rem;
+}
+
+.al-state--loading {
+  /* no extra decoration — spinner is enough */
+}
+
+.al-state--error {
+  background: var(--al-error-bg);
+  border: 1px solid var(--al-error-border);
+  border-radius: var(--al-radius);
+  color: var(--al-error-text);
+}
+
+.al-state__icon {
+  font-size: 1.8rem;
+}
+
+.al-state__detail {
+  font-family: var(--al-font-mono);
+  font-size: 0.78rem;
+  opacity: 0.75;
+}
+
+/* Spinner ring */
+.al-spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid var(--al-border);
+  border-top-color: var(--al-accent);
+  border-radius: 50%;
+  animation: al-spin 0.75s linear infinite;
+}
+
+/* ── Table wrapper ─────────────────────────────────────────────────────── */
+.al-table-wrapper {
+  overflow-x: auto;
+  border-radius: var(--al-radius);
+  border: 1px solid var(--al-border);
+}
+
+/* ── Table ─────────────────────────────────────────────────────────────── */
+.al-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+  table-layout: auto;
+}
+
+.al-table thead {
+  background: var(--al-surface);
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.al-table thead th {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--al-text-sec);
+  border-bottom: 1px solid var(--al-border);
+  white-space: nowrap;
+}
+
+.al-table tbody tr.al-row {
+  border-bottom: 1px solid var(--al-border);
+  transition: background 0.1s;
+}
+
+.al-table tbody tr.al-row:last-child {
+  border-bottom: none;
+}
+
+.al-table tbody tr.al-row:hover {
+  background: rgba(245, 166, 35, 0.04);
+}
+
+.al-table td {
+  padding: 0.7rem 1rem;
+  color: var(--al-text-pri);
+  vertical-align: middle;
+}
+
+/* ── Column modifiers ──────────────────────────────────────────────────── */
+.al-col--numeric {
+  text-align: right;
+  font-family: var(--al-font-mono);
+}
+
+/* ── Badges ────────────────────────────────────────────────────────────── */
+.al-badge {
+  display: inline-block;
+  background: var(--al-border);
+  border-radius: 4px;
+  padding: 0.1rem 0.45rem;
+  font-family: var(--al-font-mono);
+  font-size: 0.8rem;
+  color: var(--al-text-pri);
+}
+
+.al-badge--accent {
+  background: var(--al-accent-dim);
+  color: var(--al-accent);
+  border: 1px solid rgba(245, 166, 35, 0.25);
+}
+
+/* ── Empty row ─────────────────────────────────────────────────────────── */
+.al-empty {
+  text-align: center;
+  color: var(--al-text-sec);
+  padding: 2.5rem 1rem !important;
+  font-size: 0.85rem;
+  font-style: italic;
+}
+
+/* ── Footer row ────────────────────────────────────────────────────────── */
+.al-tfoot {
+  background: var(--al-surface);
+  border-top: 1px solid var(--al-border-l);
+}
+
+.al-tfoot td {
+  padding: 0.65rem 1rem;
+}
+
+.al-tfoot__label {
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--al-text-sec);
+}
+
+.al-tfoot__value {
+  font-family: var(--al-font-mono);
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--al-accent);
+}
+
+/* ── Responsive ────────────────────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .al-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .al-header__controls {
+    width: 100%;
+  }
+  .al-select {
+    flex: 1;
+  }
+}

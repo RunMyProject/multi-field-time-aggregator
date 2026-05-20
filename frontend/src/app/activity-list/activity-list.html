@@ -1,0 +1,208 @@
+<!--
+  activity-list.html
+  Author: Edoardo Sabatini
+  Date:   2026-05-20
+  Description: Template for the ActivityList component.
+               Uses Angular 21 built-in control flow (@if, @for, @switch)
+               and reads exclusively from signal/computed properties — no async pipe,
+               no Observable, no manual subscriptions.
+-->
+
+<section class="al-shell">
+
+  <!-- ── Header bar ─────────────────────────────────────────────────────── -->
+  <header class="al-header">
+    <div class="al-header__title">
+      <span class="al-header__icon">⏱</span>
+      <h1>Activity Registry</h1>
+    </div>
+
+    <div class="al-header__controls">
+      <!-- Strategy selector — drives the httpResource reactively via linkedSignal -->
+      <label class="al-select-label" for="strategySelect">Group&nbsp;by</label>
+      <select
+        id="strategySelect"
+        class="al-select"
+        [value]="selectedStrategy()"
+        (change)="onStrategyChange($event)">
+        @for (opt of svc.strategyOptions; track opt) {
+          <option [value]="opt">{{ opt }}</option>
+        }
+      </select>
+
+      <!-- Manual reload button -->
+      <button
+        class="al-btn al-btn--ghost"
+        [disabled]="isLoading()"
+        (click)="reload()"
+        title="Refresh data">
+        <span class="al-btn__icon" [class.al-spinning]="isLoading()">↻</span>
+        Refresh
+      </button>
+    </div>
+  </header>
+
+  <!-- ── Loading overlay ────────────────────────────────────────────────── -->
+  @if (isLoading()) {
+    <div class="al-state al-state--loading" role="status" aria-live="polite">
+      <span class="al-spinner" aria-hidden="true"></span>
+      <p>Fetching data…</p>
+    </div>
+  }
+
+  <!-- ── Error state ────────────────────────────────────────────────────── -->
+  @if (error()) {
+    <div class="al-state al-state--error" role="alert">
+      <span class="al-state__icon">⚠</span>
+      <p><strong>Failed to load data.</strong></p>
+      <p class="al-state__detail">{{ error() }}</p>
+      <button class="al-btn al-btn--primary" (click)="reload()">Retry</button>
+    </div>
+  }
+
+  <!-- ── Data table — switches on groupBy strategy ──────────────────────── -->
+  @if (hasValue() && !isLoading()) {
+    <div class="al-table-wrapper">
+      @switch (svc.groupBy()) {
+
+        <!-- ─── NONE: raw activity entries ─────────────────────────────── -->
+        @case ('NONE') {
+          <table class="al-table" aria-label="Raw activity entries">
+            <thead>
+              <tr>
+                <th scope="col">Project</th>
+                <th scope="col">Employee</th>
+                <th scope="col">Date</th>
+                <th scope="col" class="al-col--numeric">Hours</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of rawActivities(); track row.date + row.employee.id) {
+                <tr class="al-row">
+                  <td>{{ row.project.name }}</td>
+                  <td>{{ row.employee.name }}</td>
+                  <td>{{ row.date }}</td>
+                  <td class="al-col--numeric">
+                    <span class="al-badge">{{ row.hours }}h</span>
+                  </td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="4" class="al-empty">No activity entries found.</td>
+                </tr>
+              }
+            </tbody>
+            <tfoot>
+              <tr class="al-tfoot">
+                <td colspan="3" class="al-tfoot__label">Total logged hours</td>
+                <td class="al-col--numeric al-tfoot__value">{{ totalHours() }}h</td>
+              </tr>
+            </tfoot>
+          </table>
+        }
+
+        <!-- ─── PROJECT: aggregated by project ─────────────────────────── -->
+        @case ('PROJECT') {
+          <table class="al-table" aria-label="Hours aggregated by project">
+            <thead>
+              <tr>
+                <th scope="col">Project</th>
+                <th scope="col" class="al-col--numeric">Total Hours</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of projectRows(); track row.projectName) {
+                <tr class="al-row">
+                  <td>{{ row.projectName }}</td>
+                  <td class="al-col--numeric">
+                    <span class="al-badge al-badge--accent">{{ row.totalHours }}h</span>
+                  </td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="2" class="al-empty">No project data found.</td>
+                </tr>
+              }
+            </tbody>
+            <tfoot>
+              <tr class="al-tfoot">
+                <td class="al-tfoot__label">Grand total</td>
+                <td class="al-col--numeric al-tfoot__value">{{ totalHours() }}h</td>
+              </tr>
+            </tfoot>
+          </table>
+        }
+
+        <!-- ─── PROJECT_EMPLOYEE: aggregated by project → employee ─────── -->
+        @case ('PROJECT_EMPLOYEE') {
+          <table class="al-table" aria-label="Hours aggregated by project and employee">
+            <thead>
+              <tr>
+                <th scope="col">Project</th>
+                <th scope="col">Employee</th>
+                <th scope="col" class="al-col--numeric">Total Hours</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of projectEmployeeRows(); track row.projectName + row.employeeName) {
+                <tr class="al-row">
+                  <td>{{ row.projectName }}</td>
+                  <td>{{ row.employeeName }}</td>
+                  <td class="al-col--numeric">
+                    <span class="al-badge al-badge--accent">{{ row.totalHours }}h</span>
+                  </td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="3" class="al-empty">No data found.</td>
+                </tr>
+              }
+            </tbody>
+            <tfoot>
+              <tr class="al-tfoot">
+                <td colspan="2" class="al-tfoot__label">Grand total</td>
+                <td class="al-col--numeric al-tfoot__value">{{ totalHours() }}h</td>
+              </tr>
+            </tfoot>
+          </table>
+        }
+
+        <!-- ─── EMPLOYEE_PROJECT: aggregated by employee → project ─────── -->
+        @case ('EMPLOYEE_PROJECT') {
+          <table class="al-table" aria-label="Hours aggregated by employee and project">
+            <thead>
+              <tr>
+                <th scope="col">Employee</th>
+                <th scope="col">Project</th>
+                <th scope="col" class="al-col--numeric">Total Hours</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of employeeProjectRows(); track row.employeeName + row.projectName) {
+                <tr class="al-row">
+                  <td>{{ row.employeeName }}</td>
+                  <td>{{ row.projectName }}</td>
+                  <td class="al-col--numeric">
+                    <span class="al-badge al-badge--accent">{{ row.totalHours }}h</span>
+                  </td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="3" class="al-empty">No data found.</td>
+                </tr>
+              }
+            </tbody>
+            <tfoot>
+              <tr class="al-tfoot">
+                <td colspan="2" class="al-tfoot__label">Grand total</td>
+                <td class="al-col--numeric al-tfoot__value">{{ totalHours() }}h</td>
+              </tr>
+            </tfoot>
+          </table>
+        }
+
+      }<!-- /@switch -->
+    </div>
+  }
+
+</section>
